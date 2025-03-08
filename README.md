@@ -1,41 +1,23 @@
-# Ad Service
+# Email Service
 
-The Ad service provides advertisement based on context keys. If no context keys
-are provided then it returns random ads.
+The Email service "sends" an email to the customer with their order details by
+rendering it as a log message. It expects a JSON payload like:
 
-## Building Locally
-
-The Ad service requires at least JDK 17 to build and uses gradlew to
-compile/install/distribute. Gradle wrapper is already part of the source code.
-To build Ad Service, run:
-
-```sh
-./gradlew installDist
+```json
+{
+  "email": "some.address@website.com",
+  "order": "<serialized order protobuf>"
+}
 ```
 
-It will create an executable script
-`src/ad/build/install/oteldemo/bin/Ad`.
+## Local Build
 
-To run the Ad Service:
+We use `bundler` to manage dependencies. To get started, simply `bundle install`.
 
-```sh
-export AD_PORT=8080
-export FEATURE_FLAG_GRPC_SERVICE_ADDR=featureflagservice:50053
-./build/install/opentelemetry-demo-ad/bin/Ad
-```
+## Running locally
 
-### Upgrading Gradle
+You may run this service locally with `bundle exec ruby email_server.rb`.
 
-If you need to upgrade the version of gradle then run
+## Docker Build
 
-```sh
-./gradlew wrapper --gradle-version <new-version>
-```
-
-## Building Docker
-
-From the root of `opentelemetry-demo`, run:
-
-```sh
-docker build --file ./src/ad/Dockerfile ./
-```
+From `src/email`, run `docker build .`
