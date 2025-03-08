@@ -2,34 +2,25 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
-FROM --platform=${BUILDPLATFORM} eclipse-temurin:21-jdk AS builder
-ARG _JAVA_OPTIONS
-WORKDIR /usr/src/app/
-
-COPY ./src/ad/gradlew* ./src/ad/settings.gradle* ./src/ad/build.gradle ./
-COPY ./src/ad/gradle ./gradle
-
-RUN chmod +x ./gradlew
-RUN ./gradlew
-RUN ./gradlew downloadRepos
-
-COPY ./src/ad/ ./
-COPY ./pb/ ./proto
-RUN chmod +x ./gradlew
-RUN ./gradlew installDist -PprotoSourceDir=./proto
-
-# -----------------------------------------------------------------------------
-
-FROM eclipse-temurin:21-jre
-
-ARG OTEL_JAVA_AGENT_VERSION
-ARG _JAVA_OPTIONS
+FROM golang:1.22-alpine AS builder
 
 WORKDIR /usr/src/app/
 
-COPY --from=builder /usr/src/app/ ./
-ADD --chmod=644 https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/v$OTEL_JAVA_AGENT_VERSION/opentelemetry-javaagent.jar /usr/src/app/opentelemetry-javaagent.jar
-ENV JAVA_TOOL_OPTIONS=-javaagent:/usr/src/app/opentelemetry-javaagent.jar
+RUN --mount=type=cache,target=/go/pkg/mod/ \
+    --mount=type=bind,source=./src/checkout/go.sum,target=go.sum \
+    --mount=type=bind,source=./src/checkout/go.mod,target=go.mod \
+    go mod download
 
-EXPOSE ${AD_PORT}
-ENTRYPOINT [ "./build/install/opentelemetry-demo-ad/bin/Ad" ]
+RUN --mount=type=cache,target=/go/pkg/mod/ \
+    --mount=type=cache,target=/root/.cache/go-build \
+    --mount=type=bind,rw,source=./src/checkout,target=. \
+    go build -ldflags "-s -w" -o /go/bin/checkout/ ./
+
+FROM alpine
+
+WORKDIR /usr/src/app/
+
+COPY --from=builder /go/bin/checkout/ ./
+
+EXPOSE ${CHECKOUT_PORT}
+ENTRYPOINT [ "./checkout" ]

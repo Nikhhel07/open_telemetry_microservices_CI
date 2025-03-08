@@ -1,41 +1,36 @@
-# Ad Service
+# Checkout Service
 
-The Ad service provides advertisement based on context keys. If no context keys
-are provided then it returns random ads.
+This service provides checkout services for the application.
 
-## Building Locally
+## Local Build
 
-The Ad service requires at least JDK 17 to build and uses gradlew to
-compile/install/distribute. Gradle wrapper is already part of the source code.
-To build Ad Service, run:
+To build the service binary, run:
 
 ```sh
-./gradlew installDist
+go build -o /go/bin/checkout/
 ```
 
-It will create an executable script
-`src/ad/build/install/oteldemo/bin/Ad`.
+## Docker Build
 
-To run the Ad Service:
+From the root directory, run:
 
 ```sh
-export AD_PORT=8080
-export FEATURE_FLAG_GRPC_SERVICE_ADDR=featureflagservice:50053
-./build/install/opentelemetry-demo-ad/bin/Ad
+docker compose build checkout
 ```
 
-### Upgrading Gradle
+## Regenerate protos
 
-If you need to upgrade the version of gradle then run
+To build the protos, run from the root directory:
 
 ```sh
-./gradlew wrapper --gradle-version <new-version>
+make docker-generate-protobuf
 ```
 
-## Building Docker
+## Bump dependencies
 
-From the root of `opentelemetry-demo`, run:
+To bump all dependencies run:
 
 ```sh
-docker build --file ./src/ad/Dockerfile ./
+go get -u -t ./...
+go mod tidy
 ```
