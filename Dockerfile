@@ -6,10 +6,10 @@ ARG TARGETARCH
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /app
 COPY . .
-WORKDIR /app/Accounting
-COPY ["pb/demo.proto", "Accounting/proto/"]
-RUN dotnet restore "./Accounting/Accounting.csproj" -r linux-$TARGETARCH
-WORKDIR "/app/Accounting"
+WORKDIR /app
+COPY ["pb/demo.proto", "app/proto/"]
+RUN dotnet restore "./app/Accounting.csproj" -r linux-$TARGETARCH
+WORKDIR "/app"
 
 RUN dotnet build "./Accounting.csproj" -r linux-$TARGETARCH -c $BUILD_CONFIGURATION -o /app/build
 
