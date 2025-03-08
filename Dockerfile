@@ -19,7 +19,7 @@ WORKDIR /usr/src/app/
 ENV NODE_ENV=production
 
 COPY --chown=node:node --from=build /usr/src/app/node_modules/ ./node_modules/
-COPY ./src/payment/ ./
+COPY . ./
 COPY ./pb/demo.proto ./
 
 EXPOSE ${PAYMENT_PORT}
