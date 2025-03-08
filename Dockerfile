@@ -6,7 +6,7 @@ FROM node:22-alpine AS build
 
 WORKDIR /usr/src/app/
 
-COPY ./src/payment/package*.json ./
+COPY ./package*.json ./
 
 RUN apk add --no-cache python3 make g++ && npm ci --omit=dev
 
