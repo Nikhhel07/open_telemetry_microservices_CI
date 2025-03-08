@@ -1,27 +1,16 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
-# Copyright 2023 The OpenTelemetry Authors
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 
-FROM alpine:3.18 AS builder
+FROM golang:1.22-alpine
 
-RUN apk update && apk add git cmake make g++ grpc-dev protobuf-dev linux-headers
+WORKDIR /build
 
-COPY ./src/currency /currency
-COPY ./pb/demo.proto /currency/proto/demo.proto
+RUN apk add --no-cache protobuf-dev
 
-RUN cd /currency \
-    && mkdir -p build && cd build \
-    && cmake ../genproto \
-    && make -j$(nproc || sysctl -n hw.ncpu || echo 1) demo-proto
+COPY ./src/product-catalog/go.mod ./
+COPY ./src/product-catalog/go.sum ./
+COPY ./src/product-catalog/tools.go ./
+
+RUN go env -w GOMODCACHE=/root/.cache/go-build
+RUN --mount=type=cache,target=/root/.cache/go-build \
+    go list -e -f '{{range .Imports}}{{.}} {{end}}' tools.go | CGO_ENABLED=0 xargs go install -mod=readonly \
