@@ -1,23 +1,16 @@
-# Shipping Service
+# Payment Service
 
-The Shipping service queries `quote` for price quote, provides tracking IDs,
-and the impression of order fulfillment & shipping processes.
+This service is responsible for processing and validating payments through the
+application.
 
-## Local
+## Local Build
 
-This repo assumes you have rust 1.73 installed. You may use docker, or install
-rust [here](https://www.rust-lang.org/tools/install).
+Copy the `demo.proto` file to this directory and run `npm ci`
 
-## Build
+## Docker Build
 
-From `../../`, run:
-
-```sh
-docker compose build shipping
-```
-
-## Test
+From the root directory, run:
 
 ```sh
-cargo test
+docker compose build payment
 ```
