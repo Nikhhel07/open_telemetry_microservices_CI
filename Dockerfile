@@ -5,11 +5,11 @@ FROM --platform=${BUILDPLATFORM} mcr.microsoft.com/dotnet/sdk:8.0 AS builder
 ARG TARGETARCH
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /app
-COPY . .
-WORKDIR /app
-COPY ["pb/demo.proto", "app/proto/"]
-RUN dotnet restore "./app/Accounting.csproj" -r linux-$TARGETARCH
-WORKDIR "/app"
+COPY ["Accounting/", "Accounting/"]
+COPY ["pb/demo.proto", "Accounting/proto/"]
+RUN dotnet restore "./Accounting/Accounting.csproj" -r linux-$TARGETARCH
+WORKDIR "/app/Accounting"
+#WORKDIR "/app"
 
 RUN dotnet build "app/Accounting.csproj" -r linux-$TARGETARCH -c $BUILD_CONFIGURATION -o /app/build
 
