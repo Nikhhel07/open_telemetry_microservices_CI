@@ -1,13 +1,20 @@
-# Load Generator
+# Recommendation Service
 
-The load generator creates simulated traffic to the demo.
+This service provides recommendations for other products based on the currently
+selected product.
 
-## Accessing the Load Generator
+## Local Build
 
-You can access the web interface to Locust at `http://localhost:8080/loadgen/`.
+To build the protos, run from the root directory:
 
-## Modifying the Load Generator
+```sh
+make docker-generate-protobuf
+```
 
-Please see the [Locust
-documentation](https://docs.locust.io/en/2.16.0/writing-a-locustfile.html) to
-learn more about modifying the locustfile.
+## Docker Build
+
+From the root directory, run:
+
+```sh
+docker compose build recommendation
+```

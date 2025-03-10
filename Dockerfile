@@ -4,19 +4,29 @@
 
 FROM python:3.12-slim-bookworm AS base
 
+#
+# Fetch requirements
+#
 FROM base AS builder
 RUN apt-get -qq update \
     && apt-get install -y --no-install-recommends g++ \
     && rm -rf /var/lib/apt/lists/*
 
-COPY ./src/load-generator/requirements.txt .
+WORKDIR /usr/src/app/
+COPY ./src/recommendation/requirements.txt ./
+
+RUN pip install --upgrade pip
 RUN pip install --prefix="/reqs" -r requirements.txt
 
-FROM base
+#
+# Runtime
+#
+FROM base AS runtime
 WORKDIR /usr/src/app/
 COPY --from=builder /reqs /usr/local
-ENV PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers
-RUN playwright install --with-deps chromium
-COPY ./src/load-generator/locustfile.py .
-COPY ./src/load-generator/people.json .
-ENTRYPOINT ["locust", "--skip-log-setup"]
+COPY ./src/recommendation/ ./
+
+RUN opentelemetry-bootstrap -a install
+
+EXPOSE ${RECOMMENDATION_PORT}
+ENTRYPOINT [ "opentelemetry-instrument", "python", "recommendation_server.py" ]
