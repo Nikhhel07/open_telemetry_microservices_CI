@@ -2,31 +2,34 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
-FROM python:3.12-slim-bookworm AS base
+FROM php:8.3-cli AS base
 
-#
-# Fetch requirements
-#
-FROM base AS builder
-RUN apt-get -qq update \
-    && apt-get install -y --no-install-recommends g++ \
-    && rm -rf /var/lib/apt/lists/*
+ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
+RUN chmod +x /usr/local/bin/install-php-extensions \
+  && install-php-extensions \
+    opcache \
+    pcntl \
+    protobuf \
+    opentelemetry
 
-WORKDIR /usr/src/app/
-COPY ./src/recommendation/requirements.txt ./
+WORKDIR /var/www
+CMD ["php", "public/index.php"]
+USER www-data
+EXPOSE ${QUOTE_PORT}
 
-RUN pip install --upgrade pip
-RUN pip install --prefix="/reqs" -r requirements.txt
+FROM composer:2.7 AS vendor
 
-#
-# Runtime
-#
-FROM base AS runtime
-WORKDIR /usr/src/app/
-COPY --from=builder /reqs /usr/local
-COPY ./src/recommendation/ ./
+WORKDIR /tmp/
+COPY ./src/quote/composer.json .
 
-RUN opentelemetry-bootstrap -a install
+RUN composer install \
+    --ignore-platform-reqs \
+    --no-interaction \
+    --no-plugins \
+    --no-scripts \
+    --no-dev \
+    --prefer-dist
 
-EXPOSE ${RECOMMENDATION_PORT}
-ENTRYPOINT [ "opentelemetry-instrument", "python", "recommendation_server.py" ]
+FROM base AS final
+COPY --from=vendor /tmp/vendor/ ./vendor/
+COPY ./src/quote/ /var/www
