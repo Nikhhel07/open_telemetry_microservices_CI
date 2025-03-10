@@ -1,4 +1,4 @@
-pipeline { 
+pipeline {
     agent any
 
     stages {
@@ -6,7 +6,7 @@ pipeline {
             steps {
                 script {
                     withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
-                        sh "docker build -t ramanijadala/accounting:latest ."
+                        sh "docker build -t ramanijadala/ipservice:latest ."
                     }
                 }
             }
@@ -16,7 +16,7 @@ pipeline {
             steps {
                 script {
                     withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
-                        sh "docker push ramanijadala/accounting:latest "
+                        sh "docker push ramanijadala/ipservice:latest "
                     }
                 }
             }

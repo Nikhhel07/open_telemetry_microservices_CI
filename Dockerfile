@@ -1,36 +1,23 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-FROM --platform=${BUILDPLATFORM} mcr.microsoft.com/dotnet/sdk:8.0 AS builder
-ARG TARGETARCH
-ARG BUILD_CONFIGURATION=Release
-WORKDIR /app
-COPY . .
-WORKDIR /app
-COPY ["pb/demo.proto", "app/proto/"]
-RUN dotnet restore "./app/Accounting.csproj" -r linux-$TARGETARCH
-WORKDIR "/app"
+FROM nginx:1.27.0-otel
 
-RUN dotnet build "app/Accounting.csproj" -r linux-$TARGETARCH -c $BUILD_CONFIGURATION -o /app/build
+RUN apt-get update ; apt-get install lsb-release --no-install-recommends --no-install-suggests -y
 
-# -----------------------------------------------------------------------------
+# This file is needed for nginx-module-otel to be found.
+RUN echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] http://nginx.org/packages/mainline/debian `lsb_release -cs` nginx" | tee /etc/apt/sources.list.d/nginx.list
 
-FROM builder AS publish
-ARG TARGETARCH
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./Accounting.csproj" -r linux-$TARGETARCH -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN apt-get update ; apt-get install nginx-module-otel --no-install-recommends --no-install-suggests -y
 
-# -----------------------------------------------------------------------------
+RUN mkdir /static
+COPY src/image-provider/static /static
 
-FROM mcr.microsoft.com/dotnet/aspnet:8.0
-USER app
-WORKDIR /app
-COPY --from=publish /app/publish .
+EXPOSE ${IMAGE_PROVIDER_PORT}
 
-USER root
-RUN mkdir -p "/var/log/opentelemetry/dotnet"
-RUN chown app "/var/log/opentelemetry/dotnet"
-RUN chown app "/app/instrument.sh"
-USER app
+STOPSIGNAL SIGQUIT
 
-ENTRYPOINT ["./instrument.sh", "dotnet", "Accounting.dll"]
+COPY src/image-provider/nginx.conf.template /nginx.conf.template
+
+# Start nginx
+CMD ["/bin/sh" , "-c" , "envsubst '$OTEL_COLLECTOR_HOST $IMAGE_PROVIDER_PORT $OTEL_COLLECTOR_PORT_GRPC $OTEL_SERVICE_NAME' < /nginx.conf.template > /etc/nginx/nginx.conf && cat  /etc/nginx/nginx.conf && exec nginx -g 'daemon off;'"]
