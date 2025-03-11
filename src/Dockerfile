@@ -20,12 +20,12 @@ ARG TARGETARCH
 
 WORKDIR /usr/src/app/
 
-COPY ./src/cart/ ./
+COPY . .
 COPY ./pb/ ./pb/
 
-RUN dotnet restore ./src/cart.csproj -r linux-musl-$TARGETARCH
+RUN dotnet restore ./cart.csproj -r linux-musl-$TARGETARCH
 
-RUN dotnet publish ./src/cart.csproj -r linux-musl-$TARGETARCH --no-restore -o /cart
+RUN dotnet publish ./cart.csproj -r linux-musl-$TARGETARCH --no-restore -o /cart
 
 # -----------------------------------------------------------------------------
 
@@ -33,7 +33,7 @@ RUN dotnet publish ./src/cart.csproj -r linux-musl-$TARGETARCH --no-restore -o /
 FROM mcr.microsoft.com/dotnet/runtime-deps:8.0-alpine3.20
 
 WORKDIR /usr/src/app/
-COPY --from=builder /cart/ ./
+COPY --from=builder . .
 
 ENV DOTNET_HOSTBUILDER__RELOADCONFIGONCHANGE=false
 
