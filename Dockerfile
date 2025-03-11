@@ -22,7 +22,6 @@ ARG OPENTELEMETRY_CPP_VERSION
 
 #RUN git clone --depth 1 --branch v${OPENTELEMETRY_CPP_VERSION} https://github.com/open-telemetry/opentelemetry-cpp \
 RUN git clone --depth 1 --branch v1.19.0 https://github.com/open-telemetry/opentelemetry-cpp
-
     && cd opentelemetry-cpp/ \
     && mkdir build \
     && cd build \
