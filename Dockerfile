@@ -32,4 +32,4 @@ RUN composer install \
 
 FROM base AS final
 COPY --from=vendor /tmp/vendor/ ./vendor/
-COPY ./src/quote/ /var/www
+COPY . /var/www
