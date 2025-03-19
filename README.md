@@ -37,8 +37,7 @@ sudo apt install unzip
 unzip awscliv2.zip
 sudo ./aws/install
 aws configure
-AKIA5FTZDQ5G5VXFIDGX 
-iyUqR66ZMw38pq/YB+pkZTq2Ac4uIlVZPrcx6X3M
+
 
 curl -o kubectl https://amazon-eks.s3.us-west-2.amazonaws.com/1.19.6/2021-01-05/bin/linux/amd64/kubectl
 chmod +x ./kubectl
