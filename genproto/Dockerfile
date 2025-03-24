@@ -7,9 +7,9 @@ WORKDIR /build
 
 RUN apk add --no-cache protobuf-dev
 
-COPY ./src/product-catalog/go.mod ./
-COPY ./src/product-catalog/go.sum ./
-COPY ./src/product-catalog/tools.go ./
+COPY ./go.mod ./
+COPY ./go.sum ./
+COPY ./tools.go ./
 
 RUN go env -w GOMODCACHE=/root/.cache/go-build
 RUN --mount=type=cache,target=/root/.cache/go-build \
