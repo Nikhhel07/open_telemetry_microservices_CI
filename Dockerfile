@@ -23,5 +23,5 @@ WORKDIR /usr/src/app/
 COPY --from=builder /go/bin/product-catalog/ ./
 COPY  ./products ./products
 
-EXPOSE ${PRODUCT_CATALOG_PORT}
+EXPOSE 3550
 ENTRYPOINT [ "./product-catalog" ]
