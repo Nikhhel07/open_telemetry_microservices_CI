@@ -33,7 +33,7 @@ RUN dotnet publish ./cart.csproj -r linux-musl-$TARGETARCH --no-restore -o /cart
 FROM mcr.microsoft.com/dotnet/runtime-deps:8.0-alpine3.20
 
 WORKDIR /usr/src/app/
-COPY --from=builder . .
+COPY --from=builder /cart/ .
 
 ENV DOTNET_HOSTBUILDER__RELOADCONFIGONCHANGE=false
 
