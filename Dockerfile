@@ -18,7 +18,7 @@ WORKDIR /email_server
 
 COPY . .
 
-RUN chmod 666 ./Gemfile.lock
+#RUN chmod 666 ./Gemfile.lock
 
 COPY --from=builder /usr/local/bundle/ /usr/local/bundle/
 
