@@ -18,10 +18,10 @@ WORKDIR /email_server
 
 COPY . .
 
-#RUN chmod 666 ./Gemfile.lock
+RUN chmod 666 ./Gemfile.lock
 
 COPY --from=builder /usr/local/bundle/ /usr/local/bundle/
 
-
+RUN ls -lah /email_server
 EXPOSE ${EMAIL_PORT}
 ENTRYPOINT ["bundle", "exec", "ruby", "email_server.rb"]
