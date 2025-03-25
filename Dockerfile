@@ -11,7 +11,7 @@ WORKDIR /tmp
 COPY ./Gemfile ./Gemfile.lock ./
 
 #RUN apk update && apk add make gcc musl-dev gcompat && bundle install
-RUN apt-get update && apt-get install build-essential -y && bundle install
+RUN apt-get update && apt-get install build-essential -y && bundle install --jobs 4 --retry 3
 FROM base AS release
 
 WORKDIR /email_server
