@@ -30,6 +30,8 @@ WORKDIR /usr/src/app/
 COPY --from=builder /usr/src/app/ ./
 ADD --chmod=644 https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/v2.13.1/opentelemetry-javaagent.jar /usr/src/app/opentelemetry-javaagent.jar
 ENV JAVA_TOOL_OPTIONS=-javaagent:/usr/src/app/opentelemetry-javaagent.jar
+ADD https://github.com/grpc-ecosystem/grpc-health-probe/releases/latest/download/grpc_health_probe-linux-amd64 /bin/grpc_health_probe
+RUN chmod +x /bin/grpc_health_probe
 
 EXPOSE ${AD_PORT}
 ENTRYPOINT [ "./build/install/opentelemetry-demo-ad/bin/Ad" ]
