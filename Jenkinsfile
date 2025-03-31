@@ -2,19 +2,22 @@ pipeline {
     agent any
 
     stages {
-        stage('Deploy To Kubernetes') {
+        stage('Build & Tag Docker Image') {
             steps {
-                   withKubeConfig(caCertificate: '', clusterName: 'eks', contextName: '', credentialsId: 'k8s-cred', namespace: 'ms', restrictKubeConfigAccess: false, serverUrl: 'https://B775572DFEC747C548A81ADFA31189DC.gr7.us-east-1.eks.amazonaws.com') {
-                    sh "kubectl apply -f deployment-service.yml"
-                    
+                script {
+                    withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+                        sh "docker build -t ramanijadala/frontendproxyservice:latest ."
+                    }
                 }
             }
         }
         
-        stage('verify Deployment') {
+        stage('Push Docker Image') {
             steps {
-                  withKubeConfig(caCertificate: '', clusterName: 'eks', contextName: '', credentialsId: 'k8s-cred', namespace: 'ms', restrictKubeConfigAccess: false, serverUrl: 'https://B775572DFEC747C548A81ADFA31189DC.gr7.us-east-1.eks.amazonaws.com') {  
-                  sh "kubectl get svc -n ms"
+                script {
+                    withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+                        sh "docker push ramanijadala/frontendproxyservice:latest "
+                    }
                 }
             }
         }
