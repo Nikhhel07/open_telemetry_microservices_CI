@@ -1,33 +1,24 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-FROM node:22 AS builder
 
-WORKDIR /app
+FROM --platform=${BUILDPLATFORM} gradle:8-jdk17 AS builder
 
-COPY ./src/flagd-ui/package*.json ./
+WORKDIR /usr/src/app/
 
-RUN npm ci
-
-COPY ./src/flagd-ui/. ./
-
-RUN npm run build
+COPY ./src/fraud-detection/ ./
+COPY ./pb/ ./src/main/proto/
+RUN gradle shadowJar
 
 # -----------------------------------------------------------------------------
 
-FROM node:22-alpine
+FROM gcr.io/distroless/java17-debian11
 
-WORKDIR /app
+ARG OTEL_JAVA_AGENT_VERSION
+WORKDIR /usr/src/app/
 
-COPY ./src/flagd-ui/package*.json ./
+COPY --from=builder /usr/src/app/build/libs/fraud-detection-1.0-all.jar ./
+ADD --chmod=644 https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/v$OTEL_JAVA_AGENT_VERSION/opentelemetry-javaagent.jar /app/opentelemetry-javaagent.jar
+ENV JAVA_TOOL_OPTIONS=-javaagent:/app/opentelemetry-javaagent.jar
 
-RUN npm ci --only=production
-
-COPY --from=builder /app/src/instrumentation.ts ./instrumentation.ts
-COPY --from=builder /app/next.config.mjs ./next.config.mjs
-
-COPY --from=builder /app/.next ./.next
-
-EXPOSE 4000
-
-CMD ["npm", "start"]
+ENTRYPOINT [ "java", "-jar", "fraud-detection-1.0-all.jar" ]

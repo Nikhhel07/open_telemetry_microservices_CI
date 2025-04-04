@@ -1,25 +1,21 @@
-# Flagd-ui
+# Fraud Detection Service
 
-This application provides a user interface for configuring the feature
-flags of the flagd service.
+This service receives new orders by a Kafka topic and returns cases which are
+suspected of fraud.
 
-This is a [Next.js](https://nextjs.org/) project.
+## Local Build
 
-## Running the application
+To build the protos and the service binary, run from the repo root:
 
-The application can be run with the rest of the demo using the documented
-docker compose or make commands.
-
-## Local development
-
-To run the app locally for development you must copy
-`src/flagd/demo.flagd.json` into `src/flagd-ui/data/demo.flagd.json`
-(create the directory and file if they do not exist yet). Make sure you're
-in the `src/flagd-ui` directory and run
-the following command:
-
-```bash
-npm run dev
+```sh
+cp -r ../../pb/ src/main/proto/
+./gradlew shadowJar
 ```
 
-Then you must navigate to `localhost:4000/feature`.
+## Docker Build
+
+To build using Docker run from the repo root:
+
+```sh
+docker build -f ./src/fraud-detection/Dockerfile .
+```
