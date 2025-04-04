@@ -5,11 +5,11 @@ FROM node:22 AS builder
 
 WORKDIR /app
 
-COPY ./src/flagd-ui/package*.json ./
+COPY ./package*.json ./
 
 RUN npm ci
 
-COPY ./src/flagd-ui/. ./
+COPY . ./
 
 RUN npm run build
 
@@ -19,7 +19,7 @@ FROM node:22-alpine
 
 WORKDIR /app
 
-COPY ./src/flagd-ui/package*.json ./
+COPY ./package*.json ./
 
 RUN npm ci --only=production
 
