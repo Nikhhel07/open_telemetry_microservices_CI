@@ -6,7 +6,7 @@ pipeline {
             steps {
                 script {
                     withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
-                        sh "docker build -t ramanijadala/flagd-uiservice:latest ."
+                        sh "docker build -t nikhhel/flagd-uiservice:latest ."
                     }
                 }
             }
@@ -16,7 +16,7 @@ pipeline {
             steps {
                 script {
                     withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
-                        sh "docker push ramanijadala/flagd-uiservice:latest "
+                        sh "docker push nikhhel/flagd-uiservice:latest "
                     }
                 }
             }
