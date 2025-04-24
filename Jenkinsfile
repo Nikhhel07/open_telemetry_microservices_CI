@@ -6,7 +6,7 @@ pipeline {
             steps {
                 script {
                     withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
-                        sh "docker build -t ramanijadala/frontendproxyservice:latest ."
+                        sh "docker build -t nikhhel/frontendproxyservice:latest ."
                     }
                 }
             }
@@ -16,7 +16,7 @@ pipeline {
             steps {
                 script {
                     withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
-                        sh "docker push ramanijadala/frontendproxyservice:latest "
+                        sh "docker push nikhhel/frontendproxyservice:latest "
                     }
                 }
             }
